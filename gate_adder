@@ -1,0 +1,37 @@
+module gate_adder (
+    input wire [3:0] A,
+    input wire [3:0] B,
+    output wire [3:0] sum,
+    output wire overflow
+);
+
+    wire [3:0] xor_out1, xor_out2, xor_out3, xor_out4;
+    wire [3:0] and_out1, and_out2, and_out3, and_out4;
+    wire [4:0] or_out1, or_out2;
+    
+    // XOR gates for sum bits
+    assign xor_out1 = A[0] ^ B[0];
+    assign xor_out2 = A[1] ^ B[1];
+    assign xor_out3 = A[2] ^ B[2];
+    assign xor_out4 = A[3] ^ B[3];
+    
+    // AND gates for carry generation
+    assign and_out1 = A[0] & B[0];
+    assign and_out2 = A[1] & B[1];
+    assign and_out3 = A[2] & B[2];
+    assign and_out4 = A[3] & B[3];
+    
+    // OR gates for carry propagation
+    assign or_out1 = {1'b0, and_out1} | {and_out1, and_out2};
+    assign or_out2 = {1'b0, and_out3} | {and_out3, and_out4};
+    
+    // Sum calculation
+    assign sum[0] = xor_out1 ^ A[0] ^ B[0];
+    assign sum[1] = xor_out2 ^ or_out1;
+    assign sum[2] = xor_out3 ^ or_out2;
+    assign sum[3] = xor_out4 ^ A[3] ^ B[3];
+    
+    // Overflow calculation
+    assign overflow = or_out2[4];
+    
+endmodule
